@@ -20,11 +20,20 @@ class _HomePageState extends State<HomePage> {
             Container(
               margin: EdgeInsets.only(right: 10, left: 10, top: 40),
               decoration: BoxDecoration(boxShadow: [
-                BoxShadow(color: Colors.white60.withOpacity(0.11))
+                BoxShadow(
+                  color: Colors.white60.withOpacity(0.11),
+                  blurRadius: 40.0,
+                  spreadRadius: 0,
+                )
               ]),
               child: TextField(
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: EdgeInsets.all(10),
+                  prefixIcon: SvgPicture.asset("assets/icons/Search.svg"),
                   hintText: 'Enter Password',
                   filled: true,
                   fillColor: Colors.white,
