@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:practise/pages/home.dart';
+import 'package:practise/pages/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(fontFamily: 'Poppins'),
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: SignIn(),
     );
   }
 }
