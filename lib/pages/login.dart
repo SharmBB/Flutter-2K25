@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:practise/pages/signUp.dart';
 
 class SignIn extends StatefulWidget {
+  const SignIn({super.key});
+
   @override
   _SignInState createState() => _SignInState();
 }

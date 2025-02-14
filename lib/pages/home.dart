@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
         body: Column(
           children: [
             Container(
-              margin: EdgeInsets.only(right: 10, left: 10, top: 40),
+              margin: const EdgeInsets.only(right: 10, left: 10, top: 40),
               decoration: BoxDecoration(boxShadow: [
                 BoxShadow(
                   color: Colors.white60.withOpacity(0.11),
@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: EdgeInsets.all(10),
+                  contentPadding: const EdgeInsets.all(10),
                   prefixIcon: SvgPicture.asset("assets/icons/Search.svg"),
                   hintText: 'Enter Password',
                   filled: true,
@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
             print("acdasc");
           },
           child: Container(
-            margin: EdgeInsets.all(10),
+            margin: const EdgeInsets.all(10),
             decoration: BoxDecoration(
                 color: Colors.white24, borderRadius: BorderRadius.circular(10)),
             child: SvgPicture.asset(
