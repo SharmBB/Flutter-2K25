@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:practise/pages/Employee/employee.dart' show EmployeeSignUp;
+import 'package:practise/pages/Home/home.dart';
 import 'package:practise/pages/login.dart';
 
 class SignUp extends StatefulWidget {
@@ -66,8 +68,11 @@ class _SignUpState extends State<SignUp> {
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => SignIn()));
+                    // Navigate to Signin Password Screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignIn()),
+                    );
                   },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,

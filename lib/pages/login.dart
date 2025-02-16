@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:practise/pages/Home/home.dart';
 import 'package:practise/pages/signUp.dart';
 
 class SignIn extends StatefulWidget {
@@ -170,10 +171,16 @@ class _SignInState extends State<SignIn> {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() => _isLoading = true);
 
-      // Simulate a network request or logic for sign in
-      await Future.delayed(const Duration(seconds: 2));
+      // Simulating a delay (e.g., API call)
+      await Future.delayed(Duration(seconds: 2));
 
       setState(() => _isLoading = false);
+
+      // Navigate to HomePage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
     }
   }
 }
