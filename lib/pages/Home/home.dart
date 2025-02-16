@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:practise/pages/Employee/employee.dart';
 import 'package:practise/pages/Student/student.dart';
+import 'package:practise/pages/TimeTable/timeTable.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -30,8 +31,8 @@ class HomePage extends StatelessWidget {
                       EmployeeSignUp()),
                   _buildGridItem(context, "Students",
                       "assets/images/student.jpg", StudentSignUp()),
-                  _buildGridItem(
-                      context, "News", "assets/images/news.jpg", NewsPage()),
+                  _buildGridItem(context, "News", "assets/images/news.jpg",
+                      TimeTableScreen()),
                   _buildGridItem(
                       context, "Other", "assets/images/1.jpeg", OtherPage()),
                 ],
