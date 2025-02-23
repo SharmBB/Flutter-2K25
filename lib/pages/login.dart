@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:practise/pages/Home/home.dart';
 import 'package:practise/pages/signUp.dart';
 
@@ -29,7 +32,7 @@ class _SignInState extends State<SignIn> {
             children: <Widget>[
               const SizedBox(height: 70),
               const Text(
-                "ADMIN LOGIN - BIET",
+                "HR LOGIN - BIET",
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
@@ -51,62 +54,51 @@ class _SignInState extends State<SignIn> {
                         style: const TextStyle(color: Colors.red),
                       ),
                     const SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: () {
-                        // Navigate to Signin Password Screen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => SignUp()),
-                        );
-                      },
-                      child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Don't  Have Account ?",
-                              style: TextStyle(
-                                color: Colors.blue,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              "SignUp",
-                              style: TextStyle(
-                                color: Colors.amber,
-                              ),
-                            ),
-                          ]),
+                    Align(
+                      alignment: Alignment.centerRight, // Align to the right
+                      child: GestureDetector(
+                        onTap: () {
+                          // Navigate to Forgot Password Screen
+                        },
+                        child: const Text(
+                          "Forgot Password?",
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
                     ),
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(builder: (context) => SignUp()),
+                    //     );
+                    //   },
+                    //   child: const Row(
+                    //     mainAxisAlignment: MainAxisAlignment.center,
+                    //     children: [
+                    //       Text("Don't Have an Account?",
+                    //           style: TextStyle(color: Colors.blue)),
+                    //       SizedBox(width: 8),
+                    //       Text("Sign Up",
+                    //           style: TextStyle(color: Colors.amber)),
+                    //     ],
+                    //   ),
+                    // ),
                     const SizedBox(height: 35),
                     ElevatedButton(
-                      onPressed: _isLoading ? null : _onClick,
+                      onPressed:
+                          _isLoading ? null : _signInWithEmailAndPassword,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(15.0),
                         shape: const CircleBorder(),
                         backgroundColor: Colors.green,
                       ),
                       child: _isLoading
-                          ? const CircularProgressIndicator(
-                              color: Colors.white,
-                            )
-                          : const Icon(
-                              Icons.arrow_forward,
-                              size: 35.0,
-                              color: Colors.white,
-                            ),
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Icon(Icons.arrow_forward,
+                              size: 35.0, color: Colors.white),
                     ),
                     const SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: () {
-                        // Navigate to Forgot Password Screen
-                      },
-                      child: const Text(
-                        "Forgot Password ?",
-                        style: TextStyle(
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -158,29 +150,67 @@ class _SignInState extends State<SignIn> {
         if (value == null || value.isEmpty) {
           return 'Password Required';
         } else if (!RegExp(
-                r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\\$&*~]).{8,12}$')
+                r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,12}$')
             .hasMatch(value)) {
-          return 'Password must contain at least 8 characters, including upper/lowercase letters, numbers, and special characters, and be between 8 and 12 characters.';
+          return 'Password must be 8-12 characters with uppercase, lowercase, number, and special character.';
         }
         return null;
       },
     );
   }
 
-  void _onClick() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() => _isLoading = true);
+  void _signInWithEmailAndPassword() async {
+    if (!_formKey.currentState!.validate()) return;
 
-      // Simulating a delay (e.g., API call)
-      await Future.delayed(Duration(seconds: 2));
+    setState(() => _isLoading = true);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String errorMessage;
 
-      setState(() => _isLoading = false);
-
-      // Navigate to HomePage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
+      User? user = userCredential.user;
+      if (user != null) {
+        prefs.setString('userId', user.uid);
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
+        return;
+      } else {
+        errorMessage = 'Please verify your email!';
+      }
+    } on FirebaseAuthException catch (e) {
+      errorMessage = _getAuthErrorMessage(e.code);
     }
+    toastMessage(errorMessage);
+    setState(() => _isLoading = false);
+  }
+
+  String _getAuthErrorMessage(String code) {
+    switch (code) {
+      case 'user-not-found':
+        return 'No user found for that email.';
+      case 'wrong-password':
+        return 'Incorrect password.';
+      case 'email-already-in-use':
+        return 'Email is already registered.';
+      case 'user-disabled':
+        return 'User account is disabled.';
+      case 'invalid-email':
+        return 'Invalid email address.';
+      default:
+        return 'Login failed. Please try again.';
+    }
+  }
+
+  void toastMessage(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.TOP,
+      fontSize: 16.0,
+    );
   }
 }

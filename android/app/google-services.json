@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "564104900009",
+    "project_id": "bietadminhr",
+    "storage_bucket": "bietadminhr.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:564104900009:android:44de9c44bbc9822101e8b8",
+        "android_client_info": {
+          "package_name": "com.example.practise"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOq0lbecZu9PYlBzNdTS91oY4gnLh_bJ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

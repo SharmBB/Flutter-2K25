@@ -117,11 +117,9 @@ class _StudentSignUpState extends State<StudentSignUp> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    if (picked != null) {
-      setState(() {
-        _dobController.text = "${picked.toLocal()}".split(' ')[0];
-      });
-    }
+    setState(() {
+      _dobController.text = "${picked!.toLocal()}".split(' ')[0];
+    });
   }
 
   Widget _studentIDInput() {

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:practise/pages/Employee/employee.dart';
+import 'package:practise/pages/Employee/employeeRetrive.dart';
 import 'package:practise/pages/Student/student.dart';
 import 'package:practise/pages/TimeTable/timeTable.dart';
+
+import '../leave Request/leave_request.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -11,11 +14,11 @@ class HomePage extends StatelessWidget {
         children: [
           SizedBox(height: 50), // Spacing from top
           Text(
-            "Welcome",
+            " HR DASHBOARD",
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Colors.amberAccent,
+              color: Colors.black,
             ),
           ),
           SizedBox(height: 20),
@@ -27,14 +30,14 @@ class HomePage extends StatelessWidget {
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
                 children: [
-                  _buildGridItem(context, "Staff", "assets/images/1.jpeg",
+                  _buildGridItem(context, "Staff ", "assets/images/1.jpeg",
                       EmployeeSignUp()),
-                  _buildGridItem(context, "Students",
-                      "assets/images/student.jpg", StudentSignUp()),
+                  _buildGridItem(context, "Staff Details",
+                      "assets/images/student.jpg", EmployeeListPage()),
                   _buildGridItem(context, "News", "assets/images/news.jpg",
                       TimeTableScreen()),
-                  _buildGridItem(
-                      context, "Other", "assets/images/1.jpeg", OtherPage()),
+                  _buildGridItem(context, "Leave", "assets/images/1.jpeg",
+                      ApplyLeavePage()),
                 ],
               ),
             ),

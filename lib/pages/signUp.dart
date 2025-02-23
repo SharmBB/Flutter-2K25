@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:practise/pages/Employee/employee.dart' show EmployeeSignUp;
+import 'package:practise/pages/Employee/employee.dart';
 import 'package:practise/pages/Home/home.dart';
 import 'package:practise/pages/login.dart';
 
