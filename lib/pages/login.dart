@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:practise/forgot_Password.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:practise/pages/Home/home.dart';
-import 'package:practise/pages/signUp.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -58,7 +59,11 @@ class _SignInState extends State<SignIn> {
                       alignment: Alignment.centerRight, // Align to the right
                       child: GestureDetector(
                         onTap: () {
-                          // Navigate to Forgot Password Screen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ForgotPassword()),
+                          );
                         },
                         child: const Text(
                           "Forgot Password?",

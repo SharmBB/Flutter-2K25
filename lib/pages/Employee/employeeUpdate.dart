@@ -5,20 +5,38 @@ import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:practise/pages/Home/home.dart';
 
-class EmployeeSignUp extends StatefulWidget {
-  const EmployeeSignUp({super.key});
+class UpdateEmployeeDetails extends StatefulWidget {
+  final String employeeId;
+  const UpdateEmployeeDetails({super.key, required this.employeeId});
 
   @override
-  _EmployeeSignUpState createState() => _EmployeeSignUpState();
+  _UpdateEmployeeDetailsState createState() => _UpdateEmployeeDetailsState();
 }
 
-class _EmployeeSignUpState extends State<EmployeeSignUp> {
+class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _callingNameController = TextEditingController();
   final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _callingNameController = TextEditingController();
   final TextEditingController _nicController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _permanentAddressController =
+      TextEditingController();
+  final TextEditingController _temporaryAddressController =
+      TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
+  final TextEditingController _employeeNumberController =
+      TextEditingController();
+  final TextEditingController _dateOfJoinController = TextEditingController();
+  final TextEditingController _companyController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _employeeStatusController =
+      TextEditingController();
+  final TextEditingController _designationController = TextEditingController();
+  final TextEditingController _annualLeaveController = TextEditingController();
+  final TextEditingController _casualLeaveController = TextEditingController();
+  final TextEditingController _medicalLeaveController = TextEditingController();
+
   final TextEditingController _emergencyNameController =
       TextEditingController();
   final TextEditingController _emergencyRelationshipController =
@@ -27,25 +45,20 @@ class _EmployeeSignUpState extends State<EmployeeSignUp> {
       TextEditingController();
   final TextEditingController _emergencyPhoneController =
       TextEditingController();
-  final TextEditingController _permanentAddressController =
-      TextEditingController();
-  final TextEditingController _temporaryAddressController =
-      TextEditingController();
+
   final TextEditingController _accountNumberController =
       TextEditingController();
   final TextEditingController _bankNameController = TextEditingController();
   final TextEditingController _branchNameController = TextEditingController();
-  final TextEditingController _dobController = TextEditingController();
 
   String? _selectedTitle;
-  String? _selectedMaritalStatus;
   String? _selectedGender;
-  String? _selectedReligion;
 
-  bool _isLoading = false;
+  String? _selectedMaritalStatus;
+
+  String? _selectedReligion;
   File? _image;
   final ImagePicker _picker = ImagePicker();
-
   final List<String> _titles = ["Mr", "Mrs", "Ms"];
   final List<String> _maritalStatuses = ["Single", "Married"];
   final List<String> _genders = ["Male", "Female"];
@@ -57,18 +70,96 @@ class _EmployeeSignUpState extends State<EmployeeSignUp> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _fetchEmployeeData();
+  }
+
+  Future<void> _fetchEmployeeData() async {
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('employees')
+        .doc(widget.employeeId)
+        .get();
+    if (doc.exists) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      Map<String, dynamic>? leaveDetails =
+          data['leaveDetails'] as Map<String, dynamic>?;
+      setState(() {
+        _selectedTitle = data['title'] ?? '';
+        _fullNameController.text = data['fullName'] ?? '';
+        _callingNameController.text = data['callingName'] ?? '';
+        _nicController.text = data['nic'] ?? '';
+        _dobController.text = data['dob'] ?? '';
+        _emailController.text = data['email'] ?? '';
+        _phoneController.text = data['phone'] ?? '';
+        _emergencyNameController.text = data['emergencyContact']['name'] ?? '';
+        _emergencyRelationshipController.text =
+            data['emergencyContact']['relationship'] ?? '';
+
+        _permanentAddressController.text = data['permanentAddress'] ?? '';
+        _temporaryAddressController.text = data['temporaryAddress'] ?? '';
+        _selectedGender = data['gender'] ?? '';
+        _employeeNumberController.text = data['employeeNumber'] ?? '';
+        _dateOfJoinController.text = data['dateOFJoin'] ?? '';
+        _companyController.text = data['Company'] ?? '';
+        _locationController.text = data['Location'] ?? '';
+        _employeeStatusController.text = data['employeeStatus'] ?? '';
+        _designationController.text = data['Desigination'] ?? '';
+        _annualLeaveController.text = leaveDetails?['annualLeave'] ?? '';
+        _casualLeaveController.text = leaveDetails?['casualLeave'] ?? '';
+        _medicalLeaveController.text = leaveDetails?['medicalLeave'] ?? '';
+      });
+    }
+  }
+
+  Future<void> _updateEmployeeDetails() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('employees')
+            .doc(widget.employeeId)
+            .update({
+          'title': _selectedTitle,
+          'fullName': _fullNameController.text,
+          'callingName': _callingNameController.text,
+          'nic': _nicController.text,
+          'dob': _dobController.text,
+          'email': _emailController.text,
+          'phone': _phoneController.text,
+          'permanentAddress': _permanentAddressController.text,
+          'temporaryAddress': _temporaryAddressController.text,
+          'gender': _selectedGender,
+          'employeeNumber': _employeeNumberController.text,
+          'dateOFJoin': _dateOfJoinController.text,
+          'Company': _companyController.text,
+          'Location': _locationController.text,
+          'employeeStatus': _employeeStatusController.text,
+          'Desigination': _designationController.text,
+          'leaveDetails': {
+            'annualLeave': _annualLeaveController.text,
+            'casualLeave': _casualLeaveController.text,
+            'medicalLeave': _medicalLeaveController.text,
+          },
+        });
+        Fluttertoast.showToast(msg: "Employee details updated successfully");
+        Navigator.pop(context);
+      } catch (e) {
+        Fluttertoast.showToast(msg: "Error: ${e.toString()}");
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Employee Registration")),
+      appBar: AppBar(title: const Text("Update Employee Details")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _imagePicker(),
                 _dropdownField("Title", _titles, _selectedTitle,
                     (value) => setState(() => _selectedTitle = value)),
                 _textField(_fullNameController, "Full Name", true),
@@ -111,14 +202,27 @@ class _EmployeeSignUpState extends State<EmployeeSignUp> {
                     keyboardType: TextInputType.number),
                 _textField(_bankNameController, "Bank Name", true),
                 _textField(_branchNameController, "Branch Name", true),
-                const SizedBox(height: 30),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _onSubmit,
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text("Submit"),
-                  ),
+                // _textField(_fullNameController, "Full Name"),
+                // _textField(_callingNameController, "Calling Name"),
+                // _textField(_nicController, "NIC Number"),
+                // _textField(_dobController, "Date of Birth"),
+                // _textField(_emailController, "Email"),
+                // _textField(_phoneController, "Phone Number"),
+                // _textField(_permanentAddressController, "Permanent Address"),
+                // _textField(_temporaryAddressController, "Temporary Address"),
+                // _textField(_employeeNumberController, "Employee Number"),
+                // _textField(_dateOfJoinController, "Date of Joining"),
+                // _textField(_companyController, "Company"),
+                // _textField(_locationController, "Location"),
+                // _textField(_employeeStatusController, "Employee Status"),
+                // _textField(_designationController, "Designation"),
+                // _textField(_annualLeaveController, "Annual Leave"),
+                // _textField(_casualLeaveController, "Casual Leave"),
+                // _textField(_medicalLeaveController, "Medical Leave"),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _updateEmployeeDetails,
+                  child: const Text("Update"),
                 ),
               ],
             ),
@@ -199,120 +303,5 @@ class _EmployeeSignUpState extends State<EmployeeSignUp> {
             value == null || value.isEmpty ? "Date of Birth is required" : null,
       ),
     );
-  }
-
-  Widget _imagePicker() {
-    return Center(
-      child: GestureDetector(
-        onTap: _pickImage,
-        child: CircleAvatar(
-          radius: 50,
-          backgroundColor: Colors.grey.shade300,
-          backgroundImage: _image != null ? FileImage(_image!) : null,
-          child: _image == null
-              ? const Icon(Icons.camera_alt, size: 40, color: Colors.white)
-              : null,
-        ),
-      ),
-    );
-  }
-
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) setState(() => _image = File(pickedFile.path));
-  }
-
-  Future<void> _onSubmit() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() => _isLoading = true);
-
-      try {
-        await FirebaseFirestore.instance.collection('employees').add({
-          'title': _selectedTitle,
-          'fullName': _fullNameController.text,
-          'callingName': _callingNameController.text,
-          'nic': _nicController.text,
-          'maritalStatus': _selectedMaritalStatus,
-          'religion': _selectedReligion,
-          'permanentAddress': _permanentAddressController.text,
-          'temporaryAddress': _temporaryAddressController.text,
-          'gender': _selectedGender,
-          'dob': _dobController.text,
-          'email': _emailController.text,
-          'phone': _phoneController.text,
-          'employeeNumber': "",
-          'dateOFJoin': "",
-          'Company': "",
-          'Location': "",
-          'employeeStatus': "",
-          'Desigination': "",
-          'emergencyContact': {
-            'name': _emergencyNameController.text,
-            'relationship': _emergencyRelationshipController.text,
-            'email': _emergencyEmailController.text,
-            'phone': _emergencyPhoneController.text,
-          },
-          'bankDetails': {
-            'accountNumber': _accountNumberController.text,
-            'bankName': _bankNameController.text,
-            'branchName': _branchNameController.text,
-          },
-          'leaveDetails': {
-            'annualLeave': "",
-            'casualLeave': "",
-            'medicalLeave': "",
-          },
-          'profileImage': "image",
-        });
-
-        // Show success toast
-        Fluttertoast.showToast(
-          msg: "Employee registered successfully!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-        );
-
-        // Clear all fields after successful submission
-        _formKey.currentState?.reset();
-        _callingNameController.clear();
-        _fullNameController.clear();
-        _nicController.clear();
-        _emailController.clear();
-        _phoneController.clear();
-        _emergencyNameController.clear();
-        _emergencyRelationshipController.clear();
-        _emergencyEmailController.clear();
-        _emergencyPhoneController.clear();
-        _permanentAddressController.clear();
-        _temporaryAddressController.clear();
-        _accountNumberController.clear();
-        _bankNameController.clear();
-        _branchNameController.clear();
-        _dobController.clear();
-        _selectedTitle = null;
-        _selectedMaritalStatus = null;
-        _selectedGender = null;
-        _selectedReligion = null;
-        _image = null;
-
-        setState(() {}); // Refresh UI
-        // Navigate to home after successful addition
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  HomePage()), // Replace with your home screen widget
-        );
-      } catch (e) {
-        // Show error toast
-        Fluttertoast.showToast(
-          msg: "Error: ${e.toString()}",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-        );
-      } finally {
-        setState(() => _isLoading = false);
-      }
-    }
   }
 }

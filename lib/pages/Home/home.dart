@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:practise/Announcement/announcement.dart';
+import 'package:practise/Announcement/announcementRetrive.dart';
 import 'package:practise/pages/Employee/employee.dart';
 import 'package:practise/pages/Employee/employeeRetrive.dart';
-import 'package:practise/pages/Student/student.dart';
-import 'package:practise/pages/TimeTable/timeTable.dart';
 
 import '../leave Request/leave_request.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,10 +36,12 @@ class HomePage extends StatelessWidget {
                       EmployeeSignUp()),
                   _buildGridItem(context, "Staff Details",
                       "assets/images/student.jpg", EmployeeListPage()),
-                  _buildGridItem(context, "News", "assets/images/news.jpg",
-                      TimeTableScreen()),
-                  _buildGridItem(context, "Leave", "assets/images/1.jpeg",
+                  _buildGridItem(context, "Announcment",
+                      "assets/images/ann.jpg", HRAnnouncementScreen()),
+                  _buildGridItem(context, "Leave", "assets/images/leave.jpg",
                       ApplyLeavePage()),
+                  _buildGridItem(context, "Annocment\nDetils",
+                      "assets/images/ann.jpg", HRAnnouncementsListScreen()),
                 ],
               ),
             ),
@@ -84,6 +88,8 @@ class HomePage extends StatelessWidget {
 
 // Placeholder pages
 class StaffPage extends StatelessWidget {
+  const StaffPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: Center(child: Text("Staff Page")));
@@ -91,6 +97,8 @@ class StaffPage extends StatelessWidget {
 }
 
 class StudentsPage extends StatelessWidget {
+  const StudentsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: Center(child: Text("Students Page")));
@@ -98,6 +106,8 @@ class StudentsPage extends StatelessWidget {
 }
 
 class NewsPage extends StatelessWidget {
+  const NewsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: Center(child: Text("Details Added Soon !!!")));
@@ -105,6 +115,8 @@ class NewsPage extends StatelessWidget {
 }
 
 class OtherPage extends StatelessWidget {
+  const OtherPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: Center(child: Text("Other Page")));
