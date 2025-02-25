@@ -220,6 +220,8 @@ class EmployeeDetailPage extends StatelessWidget {
                 Text("Bank Name: ${data['bankDetails']['bankName'] ?? 'N/A'}"),
                 Text(
                     "Branch Name: ${data['bankDetails']['branchName'] ?? 'N/A'}"),
+                SizedBox(height: 20),
+                Text("Employee : ${data['employeeNumber'] ?? 'N/A'}"),
 
                 // Add more fields as necessary
               ],

@@ -53,13 +53,18 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
 
   String? _selectedTitle;
   String? _selectedGender;
-
   String? _selectedMaritalStatus;
+  String? _selectedCompany;
+  String? _selectedLocation;
+  String? _selectedDesignation;
+  String? _selectedEmployeeStatus;
+  String? _selectedStatus;
 
   String? _selectedReligion;
   File? _image;
   final ImagePicker _picker = ImagePicker();
   final List<String> _titles = ["Mr", "Mrs", "Ms"];
+  final List<String> _employeeStatuses = ["Active", "InActive"];
   final List<String> _maritalStatuses = ["Single", "Married"];
   final List<String> _genders = ["Male", "Female"];
   final List<String> _religions = [
@@ -68,6 +73,10 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
     "Hinduism",
     "Islam"
   ];
+
+  final List<String> _companies = ["AIA", "BIET"];
+  final List<String> _locations = ["Kandy", "Jaffna"];
+  final List<String> _designations = ["HR", "IT", "Engineering"];
 
   @override
   void initState() {
@@ -95,6 +104,15 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
         _emergencyNameController.text = data['emergencyContact']['name'] ?? '';
         _emergencyRelationshipController.text =
             data['emergencyContact']['relationship'] ?? '';
+        _emergencyPhoneController.text =
+            data['emergencyContact']['phone'] ?? '';
+        _emergencyEmailController.text =
+            data['emergencyContact']['email'] ?? '';
+
+        _accountNumberController.text =
+            data['bankDetails']['accountNumber'] ?? '';
+        _bankNameController.text = data['bankDetails']['bankName'] ?? '';
+        _branchNameController.text = data['bankDetails']['branchName'] ?? '';
 
         _permanentAddressController.text = data['permanentAddress'] ?? '';
         _temporaryAddressController.text = data['temporaryAddress'] ?? '';
@@ -108,6 +126,16 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
         _annualLeaveController.text = leaveDetails?['annualLeave'] ?? '';
         _casualLeaveController.text = leaveDetails?['casualLeave'] ?? '';
         _medicalLeaveController.text = leaveDetails?['medicalLeave'] ?? '';
+        _employeeNumberController.text = data['employeeNumber'] ?? '';
+        _dateOfJoinController.text = data['dateOfJoin'] ?? '';
+        _selectedCompany = data['company'] ?? '';
+        _selectedLocation = data['location'] ?? '';
+        _selectedDesignation = data['designation'] ?? '';
+        _selectedEmployeeStatus = data['employeeStatus'] ?? '';
+        _annualLeaveController.text = data['leaveDetails']['annualLeave'] ?? '';
+        _casualLeaveController.text = data['leaveDetails']['casualLeave'] ?? '';
+        _medicalLeaveController.text =
+            data['leaveDetails']['medicalLeave'] ?? '';
       });
     }
   }
@@ -131,9 +159,9 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
           'gender': _selectedGender,
           'employeeNumber': _employeeNumberController.text,
           'dateOFJoin': _dateOfJoinController.text,
-          'Company': _companyController.text,
-          'Location': _locationController.text,
-          'employeeStatus': _employeeStatusController.text,
+          'Company': _selectedCompany,
+          'Location': _selectedLocation,
+          'employeeStatus': _selectedStatus,
           'Desigination': _designationController.text,
           'leaveDetails': {
             'annualLeave': _annualLeaveController.text,
@@ -202,6 +230,29 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
                     keyboardType: TextInputType.number),
                 _textField(_bankNameController, "Bank Name", true),
                 _textField(_branchNameController, "Branch Name", true),
+                const SizedBox(height: 20),
+                _textField(
+                  _employeeNumberController,
+                  "Employee Number",
+                  true,
+                  keyboardType: TextInputType.number,
+                ),
+                _datePickerJoin(), // Updated Date Picker
+                _companyDropdown(),
+                _locationDropdown(),
+                _designationDropdown(),
+                _employeeStatusDropdown(),
+                const SizedBox(height: 20),
+                const Text("Leave Details",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                _textField(_annualLeaveController, "Annual Leave", true,
+                    keyboardType: TextInputType.number),
+                _textField(_casualLeaveController, "Casual Leave", true,
+                    keyboardType: TextInputType.number),
+                _textField(_medicalLeaveController, "Medical Leave", true,
+                    keyboardType: TextInputType.number),
+
                 // _textField(_fullNameController, "Full Name"),
                 // _textField(_callingNameController, "Calling Name"),
                 // _textField(_nicController, "NIC Number"),
@@ -254,6 +305,59 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
     );
   }
 
+  Widget _employeeStatusDropdown() {
+    List<String> _statuses = ["Active", "Inactive"];
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          labelText: "Employee Status",
+          border: const OutlineInputBorder(),
+        ),
+        value: _statuses.contains(_selectedStatus) ? _selectedStatus : null,
+        items: _statuses
+            .map((status) =>
+                DropdownMenuItem(value: status, child: Text(status)))
+            .toList(),
+        onChanged: (newValue) {
+          setState(() {
+            _selectedStatus = newValue;
+          });
+        },
+        validator: (value) => value == null ? "Please select a status" : null,
+      ),
+    );
+  }
+
+  Widget _designationDropdown() {
+    List<String> _designations = ["IT", "Engineering", "Staff"];
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          labelText: "Designation",
+          border: const OutlineInputBorder(),
+        ),
+        value: _designations.contains(_selectedDesignation)
+            ? _selectedDesignation
+            : null,
+        items: _designations
+            .map((designation) =>
+                DropdownMenuItem(value: designation, child: Text(designation)))
+            .toList(),
+        onChanged: (newValue) {
+          setState(() {
+            _selectedDesignation = newValue;
+          });
+        },
+        validator: (value) =>
+            value == null ? "Please select a designation" : null,
+      ),
+    );
+  }
+
   Widget _dropdownField(String label, List<String> items, String? value,
       void Function(String?) onChanged) {
     return Padding(
@@ -268,6 +372,55 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
             .map((item) => DropdownMenuItem(value: item, child: Text(item)))
             .toList(),
         onChanged: onChanged,
+      ),
+    );
+  }
+
+  Widget _companyDropdown() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          labelText: "Company",
+          border: const OutlineInputBorder(),
+        ),
+        value: _companies.contains(_selectedCompany) ? _selectedCompany : null,
+        items: _companies
+            .map((company) =>
+                DropdownMenuItem(value: company, child: Text(company)))
+            .toList(),
+        onChanged: (newValue) {
+          setState(() {
+            _selectedCompany = newValue;
+          });
+        },
+        validator: (value) => value == null ? "Please select a company" : null,
+      ),
+    );
+  }
+
+  Widget _locationDropdown() {
+    List<String> _locations = ["Kandy", "Colombo"];
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          labelText: "Location",
+          border: const OutlineInputBorder(),
+        ),
+        value:
+            _locations.contains(_selectedLocation) ? _selectedLocation : null,
+        items: _locations
+            .map((location) =>
+                DropdownMenuItem(value: location, child: Text(location)))
+            .toList(),
+        onChanged: (newValue) {
+          setState(() {
+            _selectedLocation = newValue;
+          });
+        },
+        validator: (value) => value == null ? "Please select a location" : null,
       ),
     );
   }
@@ -293,6 +446,40 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
               if (pickedDate != null) {
                 setState(() {
                   _dobController.text = "${pickedDate.toLocal()}".split(' ')[0];
+                });
+              }
+            },
+          ),
+        ),
+        readOnly: true, // Prevent manual input
+        validator: (value) =>
+            value == null || value.isEmpty ? "Date of Birth is required" : null,
+      ),
+    );
+  }
+
+  Widget _datePickerJoin() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: TextFormField(
+        controller: _dateOfJoinController,
+        decoration: InputDecoration(
+          labelText: "Date of Join",
+          border: const OutlineInputBorder(),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.calendar_today),
+            onPressed: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+              );
+
+              if (pickedDate != null) {
+                setState(() {
+                  _dateOfJoinController.text =
+                      "${pickedDate.toLocal()}".split(' ')[0];
                 });
               }
             },
