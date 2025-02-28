@@ -1,9 +1,6 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:practise/pages/Home/home.dart';
 
 class UpdateEmployeeDetails extends StatefulWidget {
   final String employeeId;
@@ -58,11 +55,8 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
   String? _selectedLocation;
   String? _selectedDesignation;
   String? _selectedEmployeeStatus;
-  String? _selectedStatus;
 
   String? _selectedReligion;
-  File? _image;
-  final ImagePicker _picker = ImagePicker();
   final List<String> _titles = ["Mr", "Mrs", "Ms"];
   final List<String> _employeeStatuses = ["Active", "InActive"];
   final List<String> _maritalStatuses = ["Single", "Married"];
@@ -75,8 +69,14 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
   ];
 
   final List<String> _companies = ["AIA", "BIET"];
-  final List<String> _locations = ["Kandy", "Jaffna"];
-  final List<String> _designations = ["HR", "IT", "Engineering"];
+  final List<String> _locations = ["Kandy", "Colombo"];
+  final List<String> _designations = [
+    "HR",
+    "IT",
+    "Engineering",
+    "Marketing",
+    "Finace"
+  ];
 
   @override
   void initState() {
@@ -117,6 +117,8 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
         _permanentAddressController.text = data['permanentAddress'] ?? '';
         _temporaryAddressController.text = data['temporaryAddress'] ?? '';
         _selectedGender = data['gender'] ?? '';
+        _selectedReligion = data['religion'] ?? '';
+        _selectedMaritalStatus = data['maritalStatus'] ?? '';
         _employeeNumberController.text = data['employeeNumber'] ?? '';
         _dateOfJoinController.text = data['dateOFJoin'] ?? '';
         _companyController.text = data['Company'] ?? '';
@@ -127,10 +129,10 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
         _casualLeaveController.text = leaveDetails?['casualLeave'] ?? '';
         _medicalLeaveController.text = leaveDetails?['medicalLeave'] ?? '';
         _employeeNumberController.text = data['employeeNumber'] ?? '';
-        _dateOfJoinController.text = data['dateOfJoin'] ?? '';
-        _selectedCompany = data['company'] ?? '';
-        _selectedLocation = data['location'] ?? '';
-        _selectedDesignation = data['designation'] ?? '';
+        _dateOfJoinController.text = data['dateOFJoin'] ?? '';
+        _selectedCompany = data['Company'] ?? '';
+        _selectedLocation = data['Location'] ?? '';
+        _selectedDesignation = data['Desigination'] ?? '';
         _selectedEmployeeStatus = data['employeeStatus'] ?? '';
         _annualLeaveController.text = data['leaveDetails']['annualLeave'] ?? '';
         _casualLeaveController.text = data['leaveDetails']['casualLeave'] ?? '';
@@ -161,12 +163,23 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
           'dateOFJoin': _dateOfJoinController.text,
           'Company': _selectedCompany,
           'Location': _selectedLocation,
-          'employeeStatus': _selectedStatus,
-          'Desigination': _designationController.text,
+          'employeeStatus': _selectedEmployeeStatus,
+          'Desigination': _selectedDesignation,
           'leaveDetails': {
             'annualLeave': _annualLeaveController.text,
             'casualLeave': _casualLeaveController.text,
             'medicalLeave': _medicalLeaveController.text,
+          },
+          'emergencyContact': {
+            'email': _emergencyEmailController.text,
+            'name': _emergencyNameController.text,
+            'phone': _emergencyPhoneController.text,
+            'relationship': _emergencyRelationshipController.text,
+          },
+          'bankDetails': {
+            'accountNumber': _accountNumberController.text,
+            'bankName': _bankNameController.text,
+            'branchName': _branchNameController.text,
           },
         });
         Fluttertoast.showToast(msg: "Employee details updated successfully");
@@ -231,12 +244,8 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
                 _textField(_bankNameController, "Bank Name", true),
                 _textField(_branchNameController, "Branch Name", true),
                 const SizedBox(height: 20),
-                _textField(
-                  _employeeNumberController,
-                  "Employee Number",
-                  true,
-                  keyboardType: TextInputType.number,
-                ),
+                _textField(_employeeNumberController, "Employee Number", true,
+                    keyboardType: TextInputType.number),
                 _datePickerJoin(), // Updated Date Picker
                 _companyDropdown(),
                 _locationDropdown(),
@@ -252,24 +261,6 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
                     keyboardType: TextInputType.number),
                 _textField(_medicalLeaveController, "Medical Leave", true,
                     keyboardType: TextInputType.number),
-
-                // _textField(_fullNameController, "Full Name"),
-                // _textField(_callingNameController, "Calling Name"),
-                // _textField(_nicController, "NIC Number"),
-                // _textField(_dobController, "Date of Birth"),
-                // _textField(_emailController, "Email"),
-                // _textField(_phoneController, "Phone Number"),
-                // _textField(_permanentAddressController, "Permanent Address"),
-                // _textField(_temporaryAddressController, "Temporary Address"),
-                // _textField(_employeeNumberController, "Employee Number"),
-                // _textField(_dateOfJoinController, "Date of Joining"),
-                // _textField(_companyController, "Company"),
-                // _textField(_locationController, "Location"),
-                // _textField(_employeeStatusController, "Employee Status"),
-                // _textField(_designationController, "Designation"),
-                // _textField(_annualLeaveController, "Annual Leave"),
-                // _textField(_casualLeaveController, "Casual Leave"),
-                // _textField(_medicalLeaveController, "Medical Leave"),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _updateEmployeeDetails,
@@ -306,8 +297,6 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
   }
 
   Widget _employeeStatusDropdown() {
-    List<String> _statuses = ["Active", "Inactive"];
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
       child: DropdownButtonFormField<String>(
@@ -315,14 +304,16 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
           labelText: "Employee Status",
           border: const OutlineInputBorder(),
         ),
-        value: _statuses.contains(_selectedStatus) ? _selectedStatus : null,
-        items: _statuses
+        value: _employeeStatuses.contains(_selectedEmployeeStatus)
+            ? _selectedEmployeeStatus
+            : null,
+        items: _employeeStatuses
             .map((status) =>
                 DropdownMenuItem(value: status, child: Text(status)))
             .toList(),
         onChanged: (newValue) {
           setState(() {
-            _selectedStatus = newValue;
+            _selectedEmployeeStatus = newValue;
           });
         },
         validator: (value) => value == null ? "Please select a status" : null,
@@ -331,8 +322,6 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
   }
 
   Widget _designationDropdown() {
-    List<String> _designations = ["IT", "Engineering", "Staff"];
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
       child: DropdownButtonFormField<String>(
@@ -400,8 +389,6 @@ class _UpdateEmployeeDetailsState extends State<UpdateEmployeeDetails> {
   }
 
   Widget _locationDropdown() {
-    List<String> _locations = ["Kandy", "Colombo"];
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
       child: DropdownButtonFormField<String>(

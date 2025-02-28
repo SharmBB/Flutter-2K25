@@ -12,6 +12,7 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
   final TextEditingController _employeeNumberController =
       TextEditingController();
   final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _lieuDayController = TextEditingController();
 
   String? _selectedLeaveType;
   String? _selectedDepartment;
@@ -26,15 +27,17 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
       lastDate: DateTime(2030),
     );
 
-    setState(() {
-      onDatePicked(pickedDate!);
-    });
+    if (pickedDate != null) {
+      setState(() {
+        onDatePicked(pickedDate);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Leave Form")),
+      appBar: AppBar(title: const Text("Leave Form")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -49,7 +52,7 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 value: _selectedDepartment,
                 decoration: const InputDecoration(
@@ -68,7 +71,7 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                   });
                 },
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               TextField(
                 controller: _employeeNumberController,
                 keyboardType: TextInputType.number,
@@ -78,8 +81,8 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 20),
-              Text("Reason for Leave",
+              const SizedBox(height: 20),
+              const Text("Reason for Leave",
                   style: TextStyle(fontWeight: FontWeight.bold)),
               Column(
                 children: [
@@ -100,8 +103,8 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                         setState(() {
                           _selectedLeaveType = value;
                           // Clear dates if new leave type is selected
-                          if (_selectedLeaveType != "WFH" &&
-                              _selectedLeaveType != "Short Leave" &&
+                          if (_selectedLeaveType != "Short Leave" &&
+                              _selectedLeaveType != "Half Day" &&
                               _selectedLeaveType != "Lieu Leave") {
                             _fromDate = null;
                             _toDate = null;
@@ -111,13 +114,14 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                     ),
                 ],
               ),
-              SizedBox(height: 20),
-              if (_selectedLeaveType == "WFH" ||
-                  _selectedLeaveType == "Short Leave" ||
+              const SizedBox(height: 20),
+              if (_selectedLeaveType == "Short Leave" ||
+                  _selectedLeaveType == "Half Day" ||
                   _selectedLeaveType == "Lieu Leave")
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Select Date",
+                    const Text("Select Date",
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     ElevatedButton(
                       onPressed: () => _pickDate((date) => _fromDate = date),
@@ -125,10 +129,17 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                           ? "Select Date"
                           : _fromDate!.toLocal().toString().split(' ')[0]),
                     ),
+                    if (_selectedLeaveType == "Lieu Leave") ...[
+                      const SizedBox(height: 10),
+                      const Text("Lieu Day",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 10),
+                      _datePickerLieuDay()
+                    ]
                   ],
                 )
               else ...[
-                Text("From Date",
+                const Text("From Date",
                     style: TextStyle(fontWeight: FontWeight.bold)),
                 ElevatedButton(
                   onPressed: () => _pickDate((date) => _fromDate = date),
@@ -136,8 +147,9 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                       ? "Select From Date"
                       : _fromDate!.toLocal().toString().split(' ')[0]),
                 ),
-                SizedBox(height: 10),
-                Text("To Date", style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                const Text("To Date",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 ElevatedButton(
                   onPressed: () => _pickDate((date) => _toDate = date),
                   child: Text(_toDate == null
@@ -145,7 +157,7 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                       : _toDate!.toLocal().toString().split(' ')[0]),
                 ),
               ],
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
                 controller: _notesController,
                 maxLines: 3,
@@ -155,16 +167,50 @@ class _ApplyLeavePageState extends State<ApplyLeavePage> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   // Submit logic
                 },
-                child: Text("Submit"),
+                child: const Text("Submit"),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _datePickerLieuDay() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: TextFormField(
+        controller: _lieuDayController,
+        decoration: InputDecoration(
+          labelText: "Select the Lieu Day that you work",
+          border: const OutlineInputBorder(),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.calendar_today),
+            onPressed: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(1900),
+                lastDate: DateTime.now(),
+              );
+
+              if (pickedDate != null) {
+                setState(() {
+                  _lieuDayController.text =
+                      "${pickedDate.toLocal()}".split(' ')[0];
+                });
+              }
+            },
+          ),
+        ),
+        readOnly: true, // Prevent manual input
+        validator: (value) =>
+            value == null || value.isEmpty ? "Date of Birth is required" : null,
       ),
     );
   }
