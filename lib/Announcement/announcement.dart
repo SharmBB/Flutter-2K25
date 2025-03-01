@@ -1,10 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:practise/pages/Home/home.dart';
 
 class HRAnnouncementScreen extends StatefulWidget {
-  const HRAnnouncementScreen({super.key});
+  final String? announcementId;
+  final String? currentAnnouncement;
+
+  const HRAnnouncementScreen({
+    super.key,
+    this.announcementId,
+    this.currentAnnouncement,
+  });
 
   @override
   _HRAnnouncementScreenState createState() => _HRAnnouncementScreenState();
@@ -16,47 +22,59 @@ class _HRAnnouncementScreenState extends State<HRAnnouncementScreen> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.currentAnnouncement != null) {
+      _announcementController.text = widget.currentAnnouncement!;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text("New Announcement")),
-        // appBar: AppBar(
-        //   title: Text("HR Announcement"),
-        //   backgroundColor: Colors.blueAccent,
-        // ),
-        body: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Enter Announcement:",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 10),
-                _announcementInput(),
-                SizedBox(height: 20),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _onSubmit,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 15),
-                      backgroundColor: Colors.green,
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            "Post Announcement",
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
+      appBar: AppBar(
+        title: Text(widget.announcementId == null
+            ? "New Announcement"
+            : "Edit Announcement"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Enter Announcement:",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              _announcementInput(),
+              const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _onSubmit,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
+                    backgroundColor: Colors.green,
                   ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          widget.announcementId == null
+                              ? "Post Announcement"
+                              : "Update Announcement",
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 16),
+                        ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _announcementInput() {
@@ -65,7 +83,6 @@ class _HRAnnouncementScreenState extends State<HRAnnouncementScreen> {
       keyboardType: TextInputType.text,
       maxLines: 4,
       decoration: const InputDecoration(
-        //labelText: "Email",
         hintText: "Type your announcement here ...",
         border: OutlineInputBorder(),
       ),
@@ -83,32 +100,38 @@ class _HRAnnouncementScreenState extends State<HRAnnouncementScreen> {
       setState(() => _isLoading = true);
 
       try {
-        await FirebaseFirestore.instance.collection('announcement').add({
-          'announcement': _announcementController.text,
-          'date': Timestamp.now(), // Stores the current date and time
-        });
+        if (widget.announcementId == null) {
+          // Add new announcement
+          await FirebaseFirestore.instance.collection('announcement').add({
+            'announcement': _announcementController.text,
+            'date': Timestamp.now(),
+          });
+          Fluttertoast.showToast(
+            msg: "Announcement posted successfully!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+          );
+        } else {
+          // Update existing announcement
+          await FirebaseFirestore.instance
+              .collection('announcement')
+              .doc(widget.announcementId)
+              .update({
+            'announcement': _announcementController.text,
+            'date': Timestamp.now(),
+          });
+          Fluttertoast.showToast(
+            msg: "Announcement updated successfully!",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+          );
+        }
 
-        // Show success toast
-        Fluttertoast.showToast(
-          msg: "Announcement Posted  successfully!",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-        );
-
-        // Clear all fields after successful submission
+        // Clear fields and navigate back
         _formKey.currentState?.reset();
         _announcementController.clear();
-
-        setState(() {}); // Refresh UI
-        // Navigate to home after successful addition
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  HomePage()), // Replace with your home screen widget
-        );
+        Navigator.pop(context);
       } catch (e) {
-        // Show error toast
         Fluttertoast.showToast(
           msg: "Error: ${e.toString()}",
           toastLength: Toast.LENGTH_LONG,

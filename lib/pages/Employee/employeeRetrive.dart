@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:practise/pages/Employee/employee.dart';
 import 'package:practise/pages/Employee/employeeUpdate.dart';
 import 'package:printing/printing.dart';
 
@@ -25,6 +26,17 @@ class _EmployeeListPageState extends State<EmployeeListPage> {
       appBar: AppBar(
         title: const Text("Employee List"),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EmployeeSignUp()),
+              );
+              // Add your print functionality here
+              print("Print button clicked");
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: () {
